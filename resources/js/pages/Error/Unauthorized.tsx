@@ -39,7 +39,7 @@ const Unauthorized: React.FC = () => {
               className="w-full"
               asChild
             >
-              <a href={route('home')}>
+              <a href={route('dashboard')}>
                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                 Return to Dashboard
               </a>

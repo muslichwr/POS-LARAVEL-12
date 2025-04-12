@@ -32,11 +32,6 @@ const data = {
   ],
   navAdmin: [
     {
-      title: "Dashboard",
-      url: "/admin/dashboard/",
-      icon: IconDashboard,
-    },
-    {
       title: "Manage Users",
       url: "/admin/user/index/",
       icon: IconUsers,
@@ -44,22 +39,12 @@ const data = {
     {
       title: "Manage Products",
       url: "/admin/product/index/",
-      icon: IconUsers,
+      icon: IconFolder,
     },
   ],
   navCashier: [
     {
-      title: "Dashboard",
-      url: "/cashier/dashboard/",
-      icon: IconDashboard,
-    },
-    {
-      title: "Management Products",
-      url: "/admin/product/index",
-      icon: IconFolder,
-    },
-    {
-      title: "Management Transaksi",
+      title: "Manage Transactions",
       url: "/cashier/transaction/index",
       icon: IconFolder,
     },
@@ -75,16 +60,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: "",
   }; // Jika tidak login, tampilkan default
 
-  const roleBasedNavItems = useMemo(() => {
+  // Fungsi untuk mendapatkan menu berdasarkan role
+  const getRoleBasedMenu = () => {
     switch (userRole) {
       case "admin":
-        return [...data.navAdmin,...data.navCashier];
+        return [...data.navMain, ...data.navAdmin, ...data.navCashier];
       case "cashier":
-        return [...data.navCashier];
+        return [...data.navMain, ...data.navCashier];
       default:
         return data.navMain;
     }
-  }, [userRole]);
+  };
+
+  // Gunakan useMemo untuk menghindari perhitungan ulang setiap render
+  const roleBasedNavItems = useMemo(() => getRoleBasedMenu(), [userRole]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

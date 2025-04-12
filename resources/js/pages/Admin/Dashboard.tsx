@@ -25,15 +25,8 @@ interface Statistics {
 }
 
 export default function AdminDashboard() {
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
-
-  // Fetch data statistik dari backend saat halaman dimuat
-  useEffect(() => {
-    fetch("/admin/dashboard/statistics")
-      .then((response) => response.json())
-      .then((data) => setStatistics(data))
-      .catch((error) => console.error("Error fetching statistics:", error));
-  }, []);
+  const pageProps = usePage().props;
+  const statistics: Statistics | null = pageProps.statistics || null;
 
   return (
     <SidebarProvider
@@ -46,7 +39,7 @@ export default function AdminDashboard() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title="Admin Dashboard" />
+        <SiteHeader title="Dashboard" />
 
         <div className="p-6 bg-gray-900 min-h-screen text-white">
           <Head title="Admin Dashboard" />
