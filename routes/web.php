@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/product/edit/{id}', [ProductController::class, 'edit'])->name('admin.products.edit');
         Route::put('/admin/product/{id}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/admin/product/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        Route::get('/admin/logs', [AdminController::class, 'logs'])->name('admin.logs');
     });
 
     // Cashier Dashboard

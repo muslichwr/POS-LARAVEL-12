@@ -1,65 +1,47 @@
-// resources/js/pages/Cashier/Transactions/Update.tsx
-
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-import { Head, Link, router, usePage } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { useForm } from "@inertiajs/react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useForm } from "@inertiajs/react";
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock_quantity: number;
+  description: string;
+  category: string;
+}
+
+interface Props {
+  product: Product;
+}
 
 const breadcrumbs = [
-  { title: "Cashier Dashboard", href: "/cashier/dashboard" },
-  { title: "Transaction Management", href: "/cashier/transactions" },
-  { title: "Update Transaction", href: "/cashier/transactions/edit" },
+  { title: "Admin Dashboard", href: "/admin/dashboard" },
+  { title: "Products Management", href: "/admin/product/index" },
+  { title: "Edit Product", href: "" }, // Akan diisi dengan route dinamis
 ];
 
-export default function UpdateTransaction({ transaction }: { transaction: any }) {
-  const { data, setData, patch, errors, processing } = useForm({
-    user_id: transaction.user_id || "",
-    cashier_id: transaction.cashier_id || "",
-    total_amount: transaction.total_amount || 0,
-    payment_status: transaction.payment_status || "pending",
-    payment_method: transaction.payment_method || "",
-    items: transaction.items || [],
+export default function EditProduct({ product }: Props) {
+  const { data, setData, put, errors, processing } = useForm({
+    name: product.name,
+    price: product.price.toString(),
+    stock_quantity: product.stock_quantity.toString(),
+    description: product.description || "",
+    category: product.category || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    patch(route("cashier.transactions.edit", transaction.id));
-  };
-
-  const handleChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setData(key, e.target.value);
-  };
-
-  const handleItemChange = (index: number) => (key: keyof { product_id: number; quantity: number; price: number }) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const updatedItems = [...data.items];
-    updatedItems[index] = {
-      ...updatedItems[index],
-      [key]: e.target.value,
-    };
-    setData("items", updatedItems);
-  };
-
-  const addItem = () => {
-    setData("items", [...data.items, { product_id: 0, quantity: 1, price: 0 }]);
-  };
-
-  const removeItem = (index: number) => {
-    setData("items", data.items.filter((_, i) => i !== index));
-  };
-
-  const calculateTotal = () => {
-    return data.items.reduce((total, item) => total + Number(item.quantity) * Number(item.price), 0);
+    put(route("admin.products.update", product.id));
   };
 
   return (
@@ -67,147 +49,98 @@ export default function UpdateTransaction({ transaction }: { transaction: any })
       style={{
         "--sidebar-width": "calc(var(--spacing) * 72)",
         "--header-height": "calc(var(--spacing) * 12)",
-      } as React.CSSProperties}
+      }}
     >
       <AppSidebar variant="inset" />
 
       <SidebarInset>
-        <SiteHeader title="Update Transaction" breadcrumbs={breadcrumbs} />
+        <SiteHeader title={`Edit Product : ${product.name}`} />
 
         <div className="p-6">
           <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
-            {/* User ID */}
+            {/* Name */}
             <div>
-              <Label htmlFor="user_id">User ID</Label>
+              <Label htmlFor="name">Name</Label>
               <Input
-                id="user_id"
-                value={data.user_id}
-                onChange={handleChange("user_id")}
-                className={errors.user_id && "border-destructive"}
+                id="name"
+                value={data.name}
+                onChange={(e) => setData("name", e.target.value)}
+                className={errors.name && "border-destructive"}
               />
-              {errors.user_id && <p className="text-destructive text-sm">{errors.user_id}</p>}
+              {errors.name && <p className="text-destructive text-sm mt-1">{errors.name}</p>}
             </div>
 
-            {/* Cashier ID */}
+            {/* Price */}
             <div>
-              <Label htmlFor="cashier_id">Cashier ID</Label>
+              <Label htmlFor="price">Price</Label>
               <Input
-                id="cashier_id"
-                value={data.cashier_id}
-                onChange={handleChange("cashier_id")}
-                className={errors.cashier_id && "border-destructive"}
-              />
-              {errors.cashier_id && <p className="text-destructive text-sm">{errors.cashier_id}</p>}
-            </div>
-
-            {/* Total Amount */}
-            <div>
-              <Label htmlFor="total_amount">Total Amount</Label>
-              <Input
-                id="total_amount"
                 type="number"
-                value={calculateTotal()}
-                readOnly
-                className="bg-gray-100"
+                id="price"
+                value={data.price}
+                onChange={(e) => setData("price", e.target.value)}
+                className={errors.price && "border-destructive"}
               />
+              {errors.price && <p className="text-destructive text-sm mt-1">{errors.price}</p>}
             </div>
 
-            {/* Payment Status */}
+            {/* Stock Quantity */}
             <div>
-              <Label htmlFor="payment_status">Payment Status</Label>
-              <select
-                id="payment_status"
-                value={data.payment_status}
-                onChange={handleChange("payment_status")}
-                className={errors.payment_status && "border-destructive"}
+              <Label htmlFor="stock_quantity">Stock Quantity</Label>
+              <Input
+                type="number"
+                id="stock_quantity"
+                value={data.stock_quantity}
+                onChange={(e) => setData("stock_quantity", e.target.value)}
+                className={errors.stock_quantity && "border-destructive"}
+              />
+              {errors.stock_quantity && (
+                <p className="text-destructive text-sm mt-1">{errors.stock_quantity}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={data.description}
+                onChange={(e) => setData("description", e.target.value)}
+                className={errors.description && "border-destructive"}
+              />
+              {errors.description && (
+                <p className="text-destructive text-sm mt-1">{errors.description}</p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={data.category}
+                onValueChange={(value) => setData("category", value)}
               >
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="failed">Failed</option>
-              </select>
-              {errors.payment_status && <p className="text-destructive text-sm">{errors.payment_status}</p>}
-            </div>
-
-            {/* Payment Method */}
-            <div>
-              <Label htmlFor="payment_method">Payment Method</Label>
-              <select
-                id="payment_method"
-                value={data.payment_method}
-                onChange={handleChange("payment_method")}
-                className={errors.payment_method && "border-destructive"}
-              >
-                <option value="cash">Cash</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="e_wallet">E-Wallet</option>
-              </select>
-              {errors.payment_method && <p className="text-destructive text-sm">{errors.payment_method}</p>}
-            </div>
-
-            {/* Items */}
-            <div>
-              <h3 className="font-bold mb-2">Items</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Product ID</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Input
-                          id={`product_${index}`}
-                          value={item.product_id}
-                          onChange={handleItemChange(index)("product_id")}
-                          className={errors.items?.[index]?.product_id && "border-destructive"}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          id={`quantity_${index}`}
-                          type="number"
-                          value={item.quantity}
-                          onChange={handleItemChange(index)("quantity")}
-                          className={errors.items?.[index]?.quantity && "border-destructive"}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          id={`price_${index}`}
-                          type="number"
-                          value={item.price}
-                          onChange={handleItemChange(index)("price")}
-                          className={errors.items?.[index]?.price && "border-destructive"}
-                        />
-                      </TableCell>
-                      <TableCell>${(Number(item.quantity) * Number(item.price)).toFixed(2)}</TableCell>
-                      <TableCell>
-                        <button onClick={() => removeItem(index)} type="button">
-                          Remove
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <button onClick={addItem} type="button" className="mt-2">
-                Add Item
-              </button>
+                <SelectTrigger className={errors.category && "border-destructive"}>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="electronics">Electronics</SelectItem>
+                  <SelectItem value="clothing">Clothing</SelectItem>
+                  <SelectItem value="food">Food</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.category && (
+                <p className="text-destructive text-sm mt-1">{errors.category}</p>
+              )}
             </div>
 
             {/* Actions */}
             <div className="flex gap-4">
               <Button type="submit" disabled={processing}>
-                {processing ? "Updating..." : "Update Transaction"}
+                {processing ? "Updating..." : "Update Product"}
               </Button>
               <Button asChild variant="secondary">
-                <Link href={route("cashier.transactions.index")}>Cancel</Link>
+                <Link href={route("admin.products.index")}>Cancel</Link>
               </Button>
             </div>
           </form>

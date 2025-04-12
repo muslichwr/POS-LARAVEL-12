@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -23,7 +25,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|max:255',
             'description' => 'nullable|string|max:500',
             'price' => 'required|numeric',
@@ -31,7 +33,19 @@ class ProductController extends Controller
             'category' => 'nullable|max:100',
         ]);
 
-        Product::create($request->all());
+        $product = Product::create($validated);
+
+        Log::create([
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'model' => 'Product',
+            'model_id' => $product->id,
+            'description' => "Product '{$product->name}' has been created.",
+            'changes' => null,
+            'ip_address' => Request::ip(),
+            'user_agent' => Request::header('User-Agent'),
+        ]);
+
         return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan');
     }
 

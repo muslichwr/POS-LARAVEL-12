@@ -41,6 +41,11 @@ const data = {
       url: "/admin/product/index/",
       icon: IconFolder,
     },
+    {
+      title: "Logs",
+      url: "/admin/logs",
+      icon: IconFolder,
+    },
   ],
   navCashier: [
     {
