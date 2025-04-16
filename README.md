@@ -1,1 +1,1 @@
-"# POS-LARAVEL-12" 
+Basic POS System (Minimal Viable Product)
